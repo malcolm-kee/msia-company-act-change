@@ -1,9 +1,6 @@
 #!/usr/bin/node
 
-const path = require('path');
-require('dotenv').config({
-  path: path.resolve(__dirname, '.env')
-});
+require('./load-env');
 const { connect } = require('./db');
 const { parse } = require('./company-act-parser');
 const { Snapshot } = require('./model');

@@ -1,11 +1,8 @@
 #!/usr/bin/node
 
-const path = require('path');
-require('dotenv').config({
-  path: path.resolve(__dirname, '.env')
-});
+require('./load-env');
 const { connect } = require('./db');
-const { Snapshot } = require('./model');
+const { Snapshot, Diff } = require('./model');
 const { getTodayDate, getYesterdayDate } = require('./util');
 
 async function diffAndSave() {
@@ -13,7 +10,15 @@ async function diffAndSave() {
   const todaySnapshot = await Snapshot.findOne({ date: getTodayDate() });
   const yesterdaySnapshot = await Snapshot.findOne({ date: getYesterdayDate() });
   const changedRecords = getDayDifference(todaySnapshot, yesterdaySnapshot);
-  console.info({ changedRecords });
+  if (changedRecords.length > 0) {
+    console.info('has changed records, saving...');
+    const diff = new Diff();
+    diff.date = getTodayDate();
+    diff.records = changedRecords;
+    await diff.save();
+  } else {
+    console.info('no changed records');
+  }
   db.connection.close();
 }
 
