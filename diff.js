@@ -78,7 +78,8 @@ async function sendNotificationEmail(changedRecords) {
           )
           .join('')}
         </tbody>
-      </table>`
+      </table>
+      <p>The data could also be viewed at <a href="https://ssm-update.netlify.com/">here</a></p>`
     );
   } else {
     console.info('no subscribers');
