@@ -5,6 +5,7 @@ const { connect } = require('./db');
 const { Snapshot, Diff, Subscriber } = require('./model');
 const { getTodayDate, getYesterdayDate } = require('./util');
 const { sendEmail } = require('./mailer');
+const { buildSite } = require('./build-site');
 
 async function diffAndNotify() {
   const db = await connect();
@@ -18,6 +19,7 @@ async function diffAndNotify() {
     diff.records = changedRecords;
     await diff.save();
     await sendNotificationEmail(changedRecords);
+    await buildSite();
   } else {
     console.info('no changed records');
   }
