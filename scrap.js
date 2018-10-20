@@ -1,3 +1,6 @@
+#!/usr/bin/node
+
+require('dotenv').config();
 const { connect } = require('./db');
 const { parse } = require('./company-act-parser');
 const { Snapshot } = require('./model');
