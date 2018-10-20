@@ -27,7 +27,21 @@ const diffSchema = new mongoose.Schema({
 
 const Diff = mongoose.model('diff', diffSchema, 'diffs');
 
+const subscriberSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true
+  },
+  name: {
+    type: String,
+    required: true
+  }
+});
+
+const Subscriber = mongoose.model('subscriber', subscriberSchema, 'subscribers');
+
 module.exports = {
   Diff,
-  Snapshot
+  Snapshot,
+  Subscriber
 };
