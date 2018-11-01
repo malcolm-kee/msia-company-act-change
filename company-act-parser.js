@@ -4,25 +4,27 @@ const ch = require('cheerio');
 const URL = `http://www.ssm.com.my/Pages/Legal_Framework/Companies-Act-2016.aspx`;
 
 function parse() {
-  return new Promise(fulfill => {
+  return new Promise((fulfill, reject) => {
     request(URL, function(err, response, html) {
-      if (!err && response.statusCode === 200) {
-        const $ = ch.load(html);
-        const allRecords = $('table.table')
-          .map(function() {
-            const tableTitle = $(this)
-              .prev()
-              .text()
-              .trim();
-            const titleIndex = findTitleIndex(this);
-            const docIndexes = findDocIndexes(this);
-            return getRecords(this, tableTitle, titleIndex, docIndexes);
-          })
-          .get()
-          .reduce((result, records) => result.concat(records), []);
-
-        fulfill(allRecords);
+      if (err || response.statusCode !== 200) {
+        return reject({ err, statusCode: response && response.statusCode });
       }
+      const $ = ch.load(html);
+      const allRecords = $('table.table')
+        .map(function() {
+          const tableTitle = $(this)
+            .prev()
+            .text()
+            .trim();
+          const titleIndex = findTitleIndex(this);
+          const docIndexes = findDocIndexes(this);
+          const records = getRecords(this, tableTitle, titleIndex, docIndexes);
+          return records;
+        })
+        .get()
+        .reduce((result, records) => result.concat(records), []);
+
+      fulfill(allRecords);
     });
   });
 }
@@ -68,7 +70,7 @@ function findDocIndexes(table) {
  */
 function getRecords(table, tableTitle, titleIndex, docIndexes) {
   return ch(table)
-    .find('tbody tr')
+    .find('tbody tr, thead:nth-child(2) tr')
     .map(function() {
       const children = ch(this).children();
 
@@ -83,6 +85,7 @@ function getRecords(table, tableTitle, titleIndex, docIndexes) {
             .eq(docInd)
             .text()
             .trim()
+            .replace(/\s\s+/, '')
         )
       };
     })
